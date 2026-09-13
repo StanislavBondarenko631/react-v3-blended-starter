@@ -4,7 +4,7 @@ import PhotosGalleryItem from "../PhotosGalleryItem/PhotosGalleryItem";
 
 interface PhotosGalleryProps {
   photos: Photo[]
-  onSelect: (photo:Photo) => void
+  onSelect: (photo:Photo | null) => void
 }
 
 export default function PhotosGallery({ photos, onSelect}: PhotosGalleryProps) {
