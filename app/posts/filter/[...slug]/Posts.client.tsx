@@ -8,7 +8,7 @@ import SearchBox from '@/components/SearchBox/SearchBox';
 import Pagination from '@/components/Pagination/Pagination';
 import { fetchPosts } from '@/lib/api';
 
-import css from './page.module.css';
+import css from '../../page.module.css';
 import Modal from '@/components/Modal/Modal';
 import { Post } from '@/types/post';
 import EditPostForm from '@/components/EditPostForm/EditPostForm';
@@ -16,9 +16,10 @@ import CreatePostForm from '@/components/CreatePostForm/CreatePostForm';
 
 interface PostsClientProps {
   userId: string;
+  initialData: { posts: Post[]; totalCount: number };
 }
 
-export default function PostsClient({ userId }: PostsClientProps) {
+export default function PostsClient({ userId, initialData }: PostsClientProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,6 +27,7 @@ export default function PostsClient({ userId }: PostsClientProps) {
 
   const { data } = useQuery({
     queryKey: ['posts', searchQuery, currentPage, userId],
+
     queryFn: () =>
       fetchPosts({
         searchText: searchQuery,
@@ -33,6 +35,7 @@ export default function PostsClient({ userId }: PostsClientProps) {
         ...(userId !== 'All' && { userId }),
       }),
     placeholderData: keepPreviousData,
+    initialData: currentPage === 1 && searchQuery === '' ? initialData : undefined,
   });
 
   const toggleModal = () => setIsModalOpen((prev) => !prev);
@@ -47,7 +50,7 @@ export default function PostsClient({ userId }: PostsClientProps) {
     setSearchQuery(newQuery);
   }, 300);
 
-  const totalPages = Math.ceil(data.totalCount / 8);
+  const totalPages = Math.ceil((data?.totalCount ?? 0) / 8);
   const posts = data?.posts ?? [];
 
   return (
